@@ -1,0 +1,53 @@
+syntax = "proto3";
+package training;
+option go_package = "./;pb";
+
+import "empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service FPTBooking {
+    rpc CustomerBooking(BookingRequest) returns (Booking);
+    rpc ViewBooking(ViewBookingRequest) returns (ViewBookingResponse);
+    rpc CancelBooking(CancelBookingRequest) returns (Empty);
+    rpc ViewBookingByID(ViewBookingByIDRequest) returns (ViewBookingByIDResponse);
+}
+
+message Booking {
+    string id = 1;
+    string customer_id = 2;
+    string flight_id = 3;
+    int64 code = 4;
+    string status = 5;
+    google.protobuf.Timestamp booked_date = 6;
+}
+message ViewBookingRequest {
+    int64 code = 1;
+}
+message ViewBookingByIDRequest {
+    string customer_id = 1;
+}
+message ViewBookingByIDResponse{
+    repeated ViewBookingResponse view_booking_responses = 1;
+}
+message ViewBookingResponse{
+    int64 code = 1;
+    string customer_id = 2;
+    string name_customer = 3;
+    string address = 4;
+    string phone_number = 5;
+    string email = 6;
+    string flight_id = 7;
+    string status = 8;
+    string from = 9;
+    string to = 10;
+    string name_flight = 11;
+    google.protobuf.Timestamp date = 12;
+    google.protobuf.Timestamp booked_date= 13;
+}
+message CancelBookingRequest {
+    int64 code = 1;
+}
+message BookingRequest {
+    string customer_id = 1;
+    string flight_id = 2;
+}
