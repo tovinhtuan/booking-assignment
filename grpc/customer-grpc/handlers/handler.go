@@ -88,33 +88,40 @@ func (h *CustomerHandler) UpdateCustomer(ctx context.Context, in *pb.Customer)(*
 	}
 	return cResponse, nil
 }
-func (h *CustomerHandler) ChangePassword(ctx context.Context, in *pb.Customer)(*pb.Customer, error){
-	customer, err := h.CustomerRepository.ReadCustomerByID(ctx,uuid.MustParse(in.Id))
+func (h *CustomerHandler) ChangePassword(ctx context.Context, in *pb.ChangePasswordRequest)(*pb.ChangePasswordResponse, error){
+	customer, err := h.CustomerRepository.ReadCustomerByName(ctx,in.Name)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}
 		return nil, err
 	}
-	if in.Password == customer.Password {
-		return nil, status.Error(codes.AlreadyExists,"passwords is exist")
+	if in.OldPassword == customer.Password {
+		if in.NewPassword == customer.Password{
+			return nil, status.Error(codes.AlreadyExists,"passwords is exist")
+		}else{
+			if in.NewPassword != ""{
+				customer.Password = in.NewPassword
+			}
+		}
+
 	}
-	if in.Password != ""{
-		customer.Password = in.Password
-	}
-	newCustomer, err := h.CustomerRepository.ChangePassword(ctx,customer)
+	_, err = h.CustomerRepository.ChangePassword(ctx,customer)
 	if err != nil {
 		return nil, err
 	}
-	cResponse := &pb.Customer{
-		Id:          newCustomer.Id.String(),
-		Name:        newCustomer.Name,
-		Address:     newCustomer.Address,
-		LicenseId:   newCustomer.LicenseID,
-		PhoneNumber: newCustomer.PhoneNumber,
-		Email:       newCustomer.Email,
-		Password:    newCustomer.Password,
-		Active:      false,
+	// cResponse := &pb.Customer{
+	// 	Id:          newCustomer.Id.String(),
+	// 	Name:        newCustomer.Name,
+	// 	Address:     newCustomer.Address,
+	// 	LicenseId:   newCustomer.LicenseID,
+	// 	PhoneNumber: newCustomer.PhoneNumber,
+	// 	Email:       newCustomer.Email,
+	// 	Password:    newCustomer.Password,
+	// 	Active:      false,
+	// }
+	cResponse := &pb.ChangePasswordResponse{
+		SuccessChangePassword: true,
 	}
 	return cResponse, nil
 }

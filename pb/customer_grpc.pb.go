@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type FPTCustomerClient interface {
 	CreateCustomer(ctx context.Context, in *Customer, opts ...grpc.CallOption) (*Customer, error)
 	UpdateCustomer(ctx context.Context, in *Customer, opts ...grpc.CallOption) (*Customer, error)
-	ChangePassword(ctx context.Context, in *Customer, opts ...grpc.CallOption) (*Customer, error)
+	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
 	FindCustomer(ctx context.Context, in *FindCustomerRequest, opts ...grpc.CallOption) (*Customer, error)
 	BookingHistory(ctx context.Context, in *BookingHistoryRequest, opts ...grpc.CallOption) (*ViewBookingByIDResponse, error)
 }
@@ -51,8 +51,8 @@ func (c *fPTCustomerClient) UpdateCustomer(ctx context.Context, in *Customer, op
 	return out, nil
 }
 
-func (c *fPTCustomerClient) ChangePassword(ctx context.Context, in *Customer, opts ...grpc.CallOption) (*Customer, error) {
-	out := new(Customer)
+func (c *fPTCustomerClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error) {
+	out := new(ChangePasswordResponse)
 	err := c.cc.Invoke(ctx, "/training.FPTCustomer/ChangePassword", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (c *fPTCustomerClient) BookingHistory(ctx context.Context, in *BookingHisto
 type FPTCustomerServer interface {
 	CreateCustomer(context.Context, *Customer) (*Customer, error)
 	UpdateCustomer(context.Context, *Customer) (*Customer, error)
-	ChangePassword(context.Context, *Customer) (*Customer, error)
+	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
 	FindCustomer(context.Context, *FindCustomerRequest) (*Customer, error)
 	BookingHistory(context.Context, *BookingHistoryRequest) (*ViewBookingByIDResponse, error)
 	mustEmbedUnimplementedFPTCustomerServer()
@@ -100,7 +100,7 @@ func (UnimplementedFPTCustomerServer) CreateCustomer(context.Context, *Customer)
 func (UnimplementedFPTCustomerServer) UpdateCustomer(context.Context, *Customer) (*Customer, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCustomer not implemented")
 }
-func (UnimplementedFPTCustomerServer) ChangePassword(context.Context, *Customer) (*Customer, error) {
+func (UnimplementedFPTCustomerServer) ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangePassword not implemented")
 }
 func (UnimplementedFPTCustomerServer) FindCustomer(context.Context, *FindCustomerRequest) (*Customer, error) {
@@ -159,7 +159,7 @@ func _FPTCustomer_UpdateCustomer_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _FPTCustomer_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Customer)
+	in := new(ChangePasswordRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func _FPTCustomer_ChangePassword_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: "/training.FPTCustomer/ChangePassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FPTCustomerServer).ChangePassword(ctx, req.(*Customer))
+		return srv.(FPTCustomerServer).ChangePassword(ctx, req.(*ChangePasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

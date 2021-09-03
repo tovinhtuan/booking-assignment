@@ -7,7 +7,7 @@ import "booking.proto";
 service FPTCustomer {
     rpc CreateCustomer(Customer) returns (Customer);
     rpc UpdateCustomer(Customer) returns (Customer);
-    rpc ChangePassword(Customer) returns (Customer);
+    rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
     rpc FindCustomer(FindCustomerRequest) returns (Customer);
     rpc BookingHistory(BookingHistoryRequest) returns (ViewBookingByIDResponse);
 }
@@ -28,4 +28,12 @@ message  FindCustomerRequest {
 }
 message BookingHistoryRequest {
     string id = 1;
+}
+message ChangePasswordRequest {
+    string name = 1;
+    string old_password = 2;
+    string new_password = 3;
+}
+message ChangePasswordResponse {
+    bool success_change_password =1;
 }

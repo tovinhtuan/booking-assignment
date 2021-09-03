@@ -11,5 +11,6 @@ type UpdateCustomerRequest struct {
 }
 type ChangePasswordRequest struct{
 	ID          uuid.UUID
-	Password    string
+	OldPassword string 
+	NewPassword string
 }
