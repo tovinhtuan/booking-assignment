@@ -19,5 +19,5 @@ type SearchFlightRequest struct {
 	Name string
 	From string
 	To   string
-	Date time.Time
+	// Date time.Time
 }

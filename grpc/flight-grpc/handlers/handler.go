@@ -3,10 +3,13 @@ package handlers
 import (
 	"booking-assignment/grpc/flight-grpc/models"
 	"booking-assignment/grpc/flight-grpc/repositories"
+	"booking-assignment/grpc/flight-grpc/requests"
+
 	// "booking-assignment/grpc/flight-grpc/requests"
 	"booking-assignment/pb"
 	"context"
 	"database/sql"
+
 	// "time"
 
 	// "time"
@@ -99,51 +102,63 @@ func (h *FlightHandler) UpdateFlight(ctx context.Context, in *pb.Flight) (*pb.Fl
 	}
 	return fResponse, nil
 }
-func (h *FlightHandler)SearchFlight(ctx context.Context, in *pb.SearchFlightRequest) (*pb.SearchFlightResponse, error){
+func (h *FlightHandler) SearchFlight(ctx context.Context, in *pb.SearchFlightRequest) (*pb.SearchFlightResponse, error) {
 	var (
 		flights = []*models.Flight{}
-		err error
+		err     error
 	)
-	if in.From == "" && in.To == "" &&  in.Name == ""{
+	if in.From == "" && in.To == "" && in.Name == "" {
 		return nil, status.Error(codes.InvalidArgument, "id or slut is required")
 	}
-	if in.From != "" {
-		flights, err = h.FlightRepository.ReadFlightByFrom(ctx, in.From)
-		if err != nil {
-			if err == sql.ErrNoRows{
-				return nil, status.Error(codes.NotFound, err.Error())
-			}
-			return nil, err
-		}
+	// if in.From != "" {
+	// 	flights, err = h.FlightRepository.ReadFlightByFrom(ctx, in.From)
+	// 	if err != nil {
+	// 		if err == sql.ErrNoRows{
+	// 			return nil, status.Error(codes.NotFound, err.Error())
+	// 		}
+	// 		return nil, err
+	// 	}
+	// }
+	// if in.To != "" {
+	// 	flights, err = h.FlightRepository.ReadFlightByTo(ctx, in.To, flights)
+	// 	if err != nil {
+	// 		if err == sql.ErrNoRows{
+	// 			return nil, status.Error(codes.NotFound, err.Error())
+	// 		}
+	// 		return nil, err
+	// 	}
+	// }
+	// if in.Name != "" {
+	// 	flights, err = h.FlightRepository.ReadFlightByName(ctx, in.Name, flights)
+	// 	if err != nil {
+	// 		if err == sql.ErrNoRows{
+	// 			return nil, status.Error(codes.NotFound, err.Error())
+	// 		}
+	// 		return nil, err
+	// 	}
+	// }
+	fReq := &requests.SearchFlightRequest{
+		Name: in.Name,
+		From: in.From,
+		To:   in.To,
 	}
-	if in.To != "" {
-		flights, err = h.FlightRepository.ReadFlightByTo(ctx, in.To, flights)
-		if err != nil {
-			if err == sql.ErrNoRows{
-				return nil, status.Error(codes.NotFound, err.Error())
-			}
-			return nil, err
+	flights, err = h.FlightRepository.SearchFlight(ctx, fReq)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, status.Error(codes.NotFound, err.Error())
 		}
+		return nil, err
 	}
-	if in.Name != "" {
-		flights, err = h.FlightRepository.ReadFlightByName(ctx, in.Name, flights)
-		if err != nil {
-			if err == sql.ErrNoRows{
-				return nil, status.Error(codes.NotFound, err.Error())
-			}
-			return nil, err
-		}
-	}
-	var arrFlights []*pb.Flight 
+	var arrFlights []*pb.Flight
 	for _, v := range flights {
 		flightpb := &pb.Flight{
-			Id:            v.Id.String(),
-			Name:          v.Name,
-			From:          v.From,
-			To:            v.To,
-			Date:          &timestamppb.Timestamp{
+			Id:   v.Id.String(),
+			Name: v.Name,
+			From: v.From,
+			To:   v.To,
+			Date: &timestamppb.Timestamp{
 				Seconds: v.Date.Unix(),
-				Nanos:   int32(v.Date.Nanosecond()),},
+				Nanos:   int32(v.Date.Nanosecond())},
 			Status:        v.Status,
 			AvaliableSlot: v.Avaliable_slot,
 		}
@@ -155,7 +170,7 @@ func (h *FlightHandler)SearchFlight(ctx context.Context, in *pb.SearchFlightRequ
 	return fRes, nil
 }
 
-func (h *FlightHandler) FindFlight(ctx context.Context, in *pb.FindFlightRequest)(*pb.Flight, error){
+func (h *FlightHandler) FindFlight(ctx context.Context, in *pb.FindFlightRequest) (*pb.Flight, error) {
 	if in.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "id is required")
 	}
@@ -167,13 +182,13 @@ func (h *FlightHandler) FindFlight(ctx context.Context, in *pb.FindFlightRequest
 		return nil, err
 	}
 	fRes := &pb.Flight{
-		Id:            flight.Id.String(),
-		Name:          flight.Name,
-		From:          flight.From,
-		To:            flight.To,
-		Date:          &timestamppb.Timestamp{			
+		Id:   flight.Id.String(),
+		Name: flight.Name,
+		From: flight.From,
+		To:   flight.To,
+		Date: &timestamppb.Timestamp{
 			Seconds: flight.Date.Unix(),
-			Nanos:   int32(flight.Date.Nanosecond()),},
+			Nanos:   int32(flight.Date.Nanosecond())},
 		Status:        flight.Status,
 		AvaliableSlot: flight.Avaliable_slot,
 	}
