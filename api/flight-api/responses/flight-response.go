@@ -11,3 +11,6 @@ type FlightResponse struct {
 	Status        string    `json:"status" binding:"required"`
 	AvaliableSlot int64     `json:"avaliable_slot" binding:"required"`
 }
+type SearchFlightResponse struct {
+	FlightResponses []*FlightResponse
+}

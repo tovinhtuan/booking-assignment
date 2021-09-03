@@ -22,5 +22,6 @@ func main() {
 	gr.POST("/createFlight", h.CreateFlight)
 	gr.PUT("/updateFlight",h.UpdateFlight)
 	gr.POST("/findFlight",h.FindFlight)
+	gr.POST("/searchFlight", h.SearchFlight)
 	http.ListenAndServe(":3333",g)
 }

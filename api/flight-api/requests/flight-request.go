@@ -23,3 +23,8 @@ type UpdateFlightRequest struct {
 type FindFlightRequest struct {
 	ID string `json:"id" binding:"required"`
 }
+type SearchFlightRequest struct {
+	Name          string    `json:"name"`
+	From          string    `json:"from"`
+	To            string    `json:"to"`
+}

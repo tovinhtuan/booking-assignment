@@ -15,6 +15,7 @@ type FlightHandler interface {
 	CreateFlight(c *gin.Context)
 	UpdateFlight(c *gin.Context)
 	FindFlight(c *gin.Context)
+	SearchFlight(c *gin.Context)
 }
 
 type flightHandler struct{
@@ -182,5 +183,61 @@ func (h *flightHandler) FindFlight (c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusText(http.StatusOK),
 		"payload": dto,
+	})
+}
+func (h *flightHandler) SearchFlight (c *gin.Context){
+	req := requests.SearchFlightRequest{}
+	if err := c.ShouldBind(&req) ; err != nil {
+		if validateErrors, ok := err.(validator.ValidationErrors); ok {
+			errMessages := make([]string, 0)
+			for _, v := range validateErrors {
+				errMessages = append(errMessages, v.Error())
+			}
+			
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"status" : http.StatusText(http.StatusBadRequest),
+				"error"  : errMessages,
+			})
+			return
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status" : http.StatusText(http.StatusBadRequest),
+			"error" : err.Error(),
+		})
+		return
+	}
+	fReq := &pb.SearchFlightRequest{
+		From: req.From,
+		To:   req.To,
+		Name: req.Name,
+	}
+	fRes, err := h.flightClient.SearchFlight(c.Request.Context(),fReq)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"status": http.StatusText(http.StatusInternalServerError),
+			"error":  err.Error(),
+		})
+		return
+	}
+	var dtos []*responses.FlightResponse
+	for _, v := range fRes.Flights {
+		dto := &responses.FlightResponse{
+			ID:            v.Id,
+			Name:          v.Name,
+			From:          v.From,
+			To:            v.To,
+			Date:          v.Date.AsTime(),
+			Status:        v.Status,
+			AvaliableSlot: v.AvaliableSlot,
+		}
+		dtos = append(dtos, dto)
+	}
+	// var x []*responses.FlightResponse
+	dtoss := &responses.SearchFlightResponse{
+		FlightResponses: dtos,
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusText(http.StatusOK),
+		"payload": dtoss,
 	})
 }
