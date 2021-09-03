@@ -14,6 +14,7 @@ type CustomerHandler interface {
 	CreateCustomer(c *gin.Context)
 	UpdateCustomer(c *gin.Context)
 	ChangePassword(c *gin.Context)
+	BookingHistory(c*gin.Context)
 }
 
 type customerHandler struct {
@@ -175,5 +176,65 @@ func (h *customerHandler) ChangePassword (c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusText(http.StatusOK),
 		"payload": dto,
+	})
+}
+func (h *customerHandler) BookingHistory (c *gin.Context){
+	req := requests.BookingHistoryRequest{}
+	if err := c.ShouldBind(&req); err != nil {
+		if validateErrors, ok := err.(validator.ValidationErrors); ok {
+			errMessages := make([]string, 0)
+			for _, v := range validateErrors {
+				errMessages = append(errMessages, v.Error())
+			}
+			
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"status" : http.StatusText(http.StatusBadRequest),
+				"error"  : errMessages,
+			})
+			return
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status" : http.StatusText(http.StatusBadRequest),
+			"error" : err.Error(),
+		})
+		return
+	}
+	cReq := &pb.BookingHistoryRequest{
+		Id: req.ID,
+	}
+	cRes , err := h.customerClient.BookingHistory(c.Request.Context(), cReq)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"status": http.StatusText(http.StatusInternalServerError),
+			"error":  err.Error(),
+		})
+		return
+	}
+	var dtos []*responses.BookingResponse
+	var dto *responses.BookingResponse
+	for _, v := range cRes.ViewBookingResponses{
+		dto = &responses.BookingResponse{
+			Code:         v.Code,
+			CustomerID:   v.CustomerId,
+			NameCustomer: v.NameCustomer,
+			Address:      v.Address,
+			PhoneNumber:  v.PhoneNumber,
+			Email:        v.Email,
+			FlightID:     v.FlightId,
+			Status:       v.Status,
+			From:         v.From,
+			To:           v.To,
+			NameFlight:   v.NameFlight,
+			Date:         v.Date.AsTime(),
+			BookedDate:   v.BookedDate.AsTime(),
+		}
+		dtos = append(dtos,dto)
+	}
+	dtoss := &responses.BookingHistoryResponse{
+		BookingResponses: dtos,
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusText(http.StatusOK),
+		"payload": dtoss,
 	})
 }

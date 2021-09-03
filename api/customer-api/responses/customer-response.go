@@ -1,5 +1,7 @@
 package responses
 
+import "time"
+
 type CustomerResponse struct {
 	ID          string
 	Name        string `json:"name"`
@@ -10,12 +12,29 @@ type CustomerResponse struct {
 }
 type UpdateCustomerResponse struct {
 	ID          string
-	Name        string `json:"name" binding:"required"`
-	Address     string `json:"address" binding:"required"`
-	LicenseID   string `json:"licenseID" binding:"required"`
-	PhoneNumber string `json:"phone_number" binding:"required"`
-	Email       string `json:"email" binhding:"required"`
-	Password    string `json:"password" binding:"required"`
-	Active      bool   `json:"active" binding:"required"`
+	Name        string `json:"name"`
+	Address     string `json:"address"`
+	LicenseID   string `json:"licenseID"`
+	PhoneNumber string `json:"phone_number"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	Active      bool   `json:"active"`
 }
-
+type BookingResponse struct {
+	Code         int64  `json:"code"`
+	CustomerID   string `json:"customer_id"`
+	NameCustomer string `json:"name_customer"`
+	Address      string `json:"address"`
+	PhoneNumber  string `json:"phone_number"`
+	Email        string `json:"email"`
+	FlightID     string `json:"flight_id"`
+	Status       string `json:"status"`
+	From         string `json:"from"`
+	To           string `json:"to"`
+	NameFlight   string `json:"name_flight"`
+	Date         time.Time `json:"date"`
+	BookedDate   time.Time `json:"booked_date"`
+}
+type BookingHistoryResponse struct {
+	BookingResponses []*BookingResponse
+}

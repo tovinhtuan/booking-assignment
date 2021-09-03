@@ -19,9 +19,10 @@ func main() {
 	h := handlers.NewCustomerHandler(customerClient)
 	g := gin.Default()
 	gr := g.Group("/v1/api")
-	gr.POST("/createCustomer",h.CreateCustomer)
-	gr.PUT("/updateCustomer",h.UpdateCustomer)
-	gr.PUT("/changePassword",h.ChangePassword)
-	http.ListenAndServe(":3333",g)
-	
+	gr.POST("/createCustomer", h.CreateCustomer)
+	gr.PUT("/updateCustomer", h.UpdateCustomer)
+	gr.PUT("/changePassword", h.ChangePassword)
+	gr.POST("/bookingHistory", h.BookingHistory)
+	http.ListenAndServe(":3333", g)
+
 }
