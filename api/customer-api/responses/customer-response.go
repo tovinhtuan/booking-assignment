@@ -38,3 +38,7 @@ type BookingResponse struct {
 type BookingHistoryResponse struct {
 	BookingResponses []*BookingResponse
 }
+
+type ChangePasswordResponse struct {
+	SuccessChangePassword bool `json:"success_change_password"`
+}

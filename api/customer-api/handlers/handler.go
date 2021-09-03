@@ -151,11 +151,12 @@ func (h *customerHandler) ChangePassword (c *gin.Context){
 		})
 		return
 	}
-	cReq := &pb.Customer{
-		Id:          req.ID,
-		Password:    req.Password,
+	cReq := &pb.ChangePasswordRequest{
+		Name:        req.Name,
+		OldPassword: req.OldPassword,
+		NewPassword: req.NewPassword,
 	}
-	cRes, err := h.customerClient.ChangePassword(c.Request.Context(),cReq)
+	_, err := h.customerClient.ChangePassword(c.Request.Context(),cReq)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusText(http.StatusInternalServerError),
@@ -163,15 +164,8 @@ func (h *customerHandler) ChangePassword (c *gin.Context){
 		})
 		return
 	}
-	dto := &responses.UpdateCustomerResponse{
-		ID:          cRes.Id,
-		Name:        cRes.Name,
-		Address:     cRes.Address,
-		LicenseID:   cRes.LicenseId,
-		PhoneNumber: cRes.PhoneNumber,
-		Email:       cRes.Email,
-		Password:    cRes.Password,
-		Active:      false,
+	dto := &responses.ChangePasswordResponse{
+		SuccessChangePassword: true,
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusText(http.StatusOK),

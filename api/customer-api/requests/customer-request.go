@@ -19,8 +19,9 @@ type UpdateCustomerRequest struct {
 }
 
 type ChangePasswordRequest struct {
-	ID       string `json:"id" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Name        string `json:"name" binding:"required"`
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required"`
 }
 type BookingHistoryRequest struct {
 	ID string `json:"id" binding:"required"`
